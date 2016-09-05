@@ -20,6 +20,12 @@ namespace ServerApplication
         NetworkStream stream;
         int count =0;
 
+        public ServerClass ()
+        {
+            clientDictionary = new Dictionary<string, TcpClient>();
+        }
+        public TcpClient TcpClient { get { return client; } }
+
         public Dictionary<string, TcpClient> ClientStored
         {
             get { return clientDictionary; }
@@ -39,47 +45,45 @@ namespace ServerApplication
 
             while (true)
             {
-                count += 1;
                 client = tcpListener.AcceptTcpClient();
-                Console.WriteLine("Connected");
               
-                Thread tcphandlerThread = new Thread(new ParameterizedThreadStart (tcpHandler));
-                tcphandlerThread.Start(client);
+                Thread tcphandlerThread = new Thread(new ThreadStart(tcpHandler));
+                tcphandlerThread.Start();
             }
+
         }
 
-        private void tcpHandler(object clientnew)
+        private void tcpHandler()
         {
             
             stream = client.GetStream();
             Client newClient = new Client(stream, client);
+            count += 1;
+            string dataFromClient = null;
+            Byte[] bytes = new Byte[1024];
+            dataFromClient = System.Text.Encoding.ASCII.GetString(bytes, 0, stream.Read(bytes, 0, bytes.Length));
+            Console.WriteLine("Client {1} : {0} Connected", dataFromClient, count);
+
+            try
+            {
+                    clientDictionary.Add(dataFromClient, client);
+               
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
             clientList.Add(newClient);
 
-            while (true)
+                 Thread clientdata = new Thread(new ThreadStart(newClient.ReciveData));
+                 clientdata.Start();
+            foreach (var client in clientDictionary)
             {
-                Thread clientdata = new Thread(new ThreadStart(newClient.ReciveData));
-                clientdata.Start();
-              
-                if (clientList.Count  > 0)
-                {
-                    SendToAll(clientList);
-                }
-                else
-                {
-                    newClient.SendData();
-                }
-                             
+              Thread sendData= new Thread (new ThreadStart (newClient.SendData));
+                sendData.Start();
             }
+           
         }
-        public void SendToAll(List<Client> clientList)
-        {
-
-            foreach (Client client in clientList)
-            {
-                client.SendData();
-            }
-
-        }
-
+     
     }
 }

@@ -27,21 +27,23 @@ namespace ServerApplication
       
         public void ReciveData()
         {
-             int i = stream.Read(message, 0, message.Length);
-             data = Encoding.ASCII.GetString(message);
+                int i = stream.Read(message, 0, message.Length);
+                data = Encoding.ASCII.GetString(message);
 
-             clientMessageQueue.Enqueue(data);
-
-             //SendData();
+                clientMessageQueue.Enqueue(data);
+           
         }
 
         public void SendData()
         {
             if (data != null)
             {
-               
-                msg = System.Text.Encoding.ASCII.GetBytes(data);
-               stream.Write(msg, 0, msg.Length);
+
+                if (clientMessageQueue != null)
+                {
+                    msg = System.Text.Encoding.ASCII.GetBytes(data);
+                   stream.Write(msg, 0, msg.Length);
+                 }
                 //if (clientMessageQueue != null)
                 //{
                 //    clientMessageQueue.Dequeue();

@@ -11,6 +11,9 @@ namespace ClientApplication
 {
     class ClientClass
     {
+
+        NetworkStream stream;
+        TcpClient client;
         public void ConnectClient()
         {
             Thread mthread = new Thread(new ThreadStart(ConnecttcpClient));
@@ -19,9 +22,9 @@ namespace ClientApplication
 
         private void ConnecttcpClient()
         {
-            TcpClient client = new TcpClient();
+             client = new TcpClient();
 
-            client.Connect("127.0.0.1",1300);
+            client.Connect("127.0.0.1", 1300);
             Console.Title = "CLIENT";
             Console.WriteLine(" >>  Connected");
 
@@ -29,6 +32,15 @@ namespace ClientApplication
             NetworkStream stream = client.GetStream();
 
             CreateClient newclient = new CreateClient(stream, client);
+
+            NetworkStream streamName = client.GetStream();
+            Console.WriteLine("Enter your name");
+            string s = Console.ReadLine();
+
+            byte[] message = Encoding.ASCII.GetBytes(s);
+            streamName.Write(message, 0, message.Length);
+
+
             Thread thread1 = new Thread(newclient.SendDataToServer);
             thread1.Start();
             Thread thread2 = new Thread(newclient.ReadDataFromServer);

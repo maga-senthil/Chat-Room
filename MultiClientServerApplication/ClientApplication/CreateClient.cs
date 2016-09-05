@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -27,7 +28,7 @@ namespace ClientApplication
             while (true)
             {
                 string m; 
-                m = Console .ReadLine ();
+                m = Console .ReadLine();
                 byte[] message =ASCIIEncoding .ASCII.GetBytes(m);
                 stream.Write(message, 0, message.Length);
               
@@ -40,10 +41,16 @@ namespace ClientApplication
             {
                 if (data != null)
                 {
-                    
-                    byte[] message = new byte[1204];
-                    Int64  i = stream.Read(message, 0, message.Length);
-                    Console.WriteLine( Encoding.ASCII.GetString(message));
+                    //try
+                    //{
+                        byte[] message = new byte[1204];
+                        Int64 i = stream.Read(message, 0, message.Length);
+                       Console.WriteLine(Encoding.ASCII.GetString(message));
+                    //}
+                    //catch(IOException e)
+                    //{
+                    //    Console.WriteLine("{0}: the write operation could not be performed specified part of the file is locked.",e.GetType().Name);
+                    //}
                 }
             }
         }
