@@ -12,19 +12,20 @@ namespace ServerApplication
     class ServerClass
     {
         TcpListener tcpListener;
-        TcpClient client;
-        List<Client> clientList = new List<Client>();
+        List<TcpClient> clientList = new List<TcpClient>();
         private Dictionary<string, TcpClient> clientDictionary;
+        public readonly int BufferSize = 2 * 1024;
         byte[] message = new byte[1204];
         string data;
-        NetworkStream stream;
+        TcpClient client;
         int count =0;
 
         public ServerClass ()
         {
             clientDictionary = new Dictionary<string, TcpClient>();
         }
-        public TcpClient TcpClient { get { return client; } }
+        public bool Running { get; private set; }
+      
 
         public Dictionary<string, TcpClient> ClientStored
         {
@@ -41,9 +42,9 @@ namespace ServerApplication
             tcpListener = new TcpListener(IPAddress.Any, 1300);
             tcpListener.Start();
             Console.Title = "SERVER";
-            Console.WriteLine("Listening");
-
-            while (true)
+            Console.WriteLine(" >> Server started.");
+            Running = true;
+            while (Running)
             {
                 client = tcpListener.AcceptTcpClient();
               
@@ -55,35 +56,43 @@ namespace ServerApplication
 
         private void tcpHandler()
         {
+
+            NetworkStream stream = client.GetStream();
+            HandleClient newClient = new HandleClient(stream, client);
+
+            Byte[] bytes = new Byte[BufferSize];
+            int bytesRead = stream.Read(bytes, 0, bytes.Length);
+
+                string dataFromClient = System.Text.Encoding.ASCII.GetString(bytes, 0, bytesRead);
+                Console.WriteLine(" >> {0} Connected", dataFromClient);
+
+                clientDictionary.Add(dataFromClient, client);
+
+                clientList.Add(client);
+
+                foreach (TcpClient R in clientList)
+                {
+                     newClient.ReciveData();
+                }
+
+                foreach (TcpClient s in clientList)
+                {
+                    newClient.SendData();
+                }
+
             
-            stream = client.GetStream();
-            Client newClient = new Client(stream, client);
-            count += 1;
-            string dataFromClient = null;
-            Byte[] bytes = new Byte[1024];
-            dataFromClient = System.Text.Encoding.ASCII.GetString(bytes, 0, stream.Read(bytes, 0, bytes.Length));
-            Console.WriteLine("Client {1} : {0} Connected", dataFromClient, count);
-
-            try
-            {
-                    clientDictionary.Add(dataFromClient, client);
-               
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            clientList.Add(newClient);
-
-                 Thread clientdata = new Thread(new ThreadStart(newClient.ReciveData));
-                 clientdata.Start();
-            foreach (var client in clientDictionary)
-            {
-              Thread sendData= new Thread (new ThreadStart (newClient.SendData));
-                sendData.Start();
-            }
-           
         }
+
+      
+            //Thread clientdata = new Thread(new ThreadStart(newClient.ReciveData));
+            //clientdata.Start();
+            //foreach (var client in clientDictionary)
+            //{
+            //  Thread sendData= new Thread (new ThreadStart (newClient.SendData));
+            //    sendData.Start();
+            //}
+           
+        
      
     }
 }

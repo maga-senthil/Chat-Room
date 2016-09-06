@@ -14,8 +14,6 @@ namespace ClientApplication
         public TcpClient client;
         Byte[] data = new Byte[1024];
         Byte[] msg = new Byte[1024];
-        //Byte[] bytes = new Byte[1024];
-
 
         public CreateClient(NetworkStream stream, TcpClient client)
         {
@@ -25,34 +23,17 @@ namespace ClientApplication
 
         public void SendDataToServer()
         {
-            while (true)
-            {
-                string m; 
-                m = Console .ReadLine();
+                string m = Console .ReadLine();
                 byte[] message =ASCIIEncoding .ASCII.GetBytes(m);
                 stream.Write(message, 0, message.Length);
-              
-            }
 
         }
         public void ReadDataFromServer()
         {
-            while (true)
-            {
-                if (data != null)
-                {
-                    //try
-                    //{
-                        byte[] message = new byte[1204];
-                        Int64 i = stream.Read(message, 0, message.Length);
-                       Console.WriteLine(Encoding.ASCII.GetString(message));
-                    //}
-                    //catch(IOException e)
-                    //{
-                    //    Console.WriteLine("{0}: the write operation could not be performed specified part of the file is locked.",e.GetType().Name);
-                    //}
-                }
-            }
+            byte[] message = new byte[1204];
+            Int64 i = stream.Read(message, 0, message.Length);
+            Console.WriteLine(Encoding.ASCII.GetString(message));
+           
         }
     }
 }

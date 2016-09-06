@@ -91,11 +91,11 @@ namespace ServerApplication
             if(N.left != null)
             {
                 send(N.left, ref newstring );
-                newstring =newstring + N.value.ToString().PadLeft(3);
+                newstring = N.value.ToString().PadLeft(2);
             }
             else
             {
-                newstring = newstring + N.value.ToString().PadLeft(3);
+                newstring = N.value.ToString().PadLeft(2);
             }
             if(N.right != null)
             {
