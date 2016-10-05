@@ -12,14 +12,8 @@ namespace ClientApplication
     {
         static void Main(string[] args)
         {
-
-            ClientClass client = new ClientClass();
-            client.ConnectClient();
-            
-            Console.ReadLine();
-           
+            Client client = new Client("127.0.0.1", 1300);
+            Parallel.Invoke(client.ReadDataFromServer, client.SendDataToServer);
         }
     }
-
-   
 }
